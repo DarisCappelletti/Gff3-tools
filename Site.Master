@@ -1,0 +1,344 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Gff3_tools.SiteMaster" %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %> - Portfolio</title>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+        integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer" />
+
+    <!-- Bootstrap 5.2 -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
+        crossorigin="anonymous">
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+        crossorigin="anonymous"></script>
+
+    <asp:PlaceHolder runat="server">
+        <%: Scripts.Render("~/bundles/modernizr") %>
+    </asp:PlaceHolder>
+
+    <webopt:BundleReference runat="server" Path="~/Content/css" />
+    <%--<link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />--%>
+    <link rel="shortcut icon" type="image/x-icon" href="/lib/Images/logo/daris-logo.ico" />
+
+    <asp:ContentPlaceHolder ID="Head" runat="server">
+    </asp:ContentPlaceHolder>
+
+    <style>
+        .personal-image {
+            max-height: 200px;
+            float: left;
+        }
+
+        .progress-label {
+            text-align: left;
+            padding-left: 30px;
+        }
+
+        .card {
+            margin-bottom: 30px;
+        }
+
+        .card-hover {
+            color: black;
+            text-decoration: none;
+            z-index: 10;
+        }
+
+            .card-hover:hover {
+                color: black;
+                -webkit-box-shadow: 0px 0px 15px 5px rgba(0,0,0,0.32);
+                box-shadow: 0px 0px 15px 5px rgba(0,0,0,0.32);
+                transform: scale(1.1);
+                transition: transform .2s;
+            }
+
+        .social-pill {
+            cursor: pointer;
+            color: white;
+            text-decoration: none;
+            background-color: #0d6efd;
+            font-size: 0.95em;
+        }
+
+            .social-pill:hover {
+                color: #fff;
+                background-color: #0b5ed7;
+            }
+
+        .accordion-button {
+            /* create a grid */
+            display: grid;
+            /* create colums. 1fr means use available space */
+            grid-template-columns: 1fr max-content max-content;
+            align-items: center;
+            grid-gap: 10px;
+            padding-left: 30px;
+        }
+
+            .accordion-button:after {
+                position: absolute;
+                margin-left: 5px;
+            }
+
+        /* On screens that are 600px or less, set the background color to olive */
+        @media screen and (max-width: 768px) {
+            .accordion-pills {
+                display: grid;
+            }
+
+                .accordion-pills > .badge {
+                    margin-bottom: 2px;
+                }
+
+            .div-personal-image {
+                text-align: center;
+            }
+
+            .personal-image {
+                float: none;
+            }
+        }
+
+        #btn-back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            z-index: 10;
+        }
+
+        .footer-element-dx p {
+            float: right;
+        }
+
+        .messagealert {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            z-index: 100000;
+            padding: 0;
+            font-size: 15px;
+        }
+
+        @media only screen and (max-width: 768px) {
+            .footer-element-sx p, .footer-element-dx p {
+                text-align: center;
+                float: none;
+            }
+        }
+
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent url('../images/bg-opacity-50_b_100.png'); /* change if the mask should have another color then white */
+            z-index: 256; /* makes sure it stays on top */
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        #loading {
+            position: relative;
+            left: 40%;
+            right: 40%;
+            top: 40%;
+            bottom: 40%;
+        }
+
+        #waiting,
+        #waiting-front {
+            position: fixed;
+            width: 100vw;
+            transition: all 1s;
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        #waiting {
+            top: 0;
+            z-index: 9999;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        #waiting-front {
+            z-index: 9999;
+            color: #fff;
+            text-align: center;
+            margin-top: 50vh;
+            transform: translateY(-50%);
+        }
+
+            #waiting-front p {
+                font-size: 2em;
+            }
+
+            #waiting.show,
+            #waiting-front.show {
+                visibility: visible;
+                opacity: 1;
+            }
+    </style>
+
+    <script type="text/javascript">
+        function ShowMessage(message, messagetype) {
+            var cssclass;
+            switch (messagetype) {
+                case 'Successo':
+                    cssclass = 'alert-success'
+                    break;
+                case 'Errore':
+                    cssclass = 'alert-danger'
+                    break;
+                case 'Attenzione':
+                    cssclass = 'alert-warning'
+                    break;
+                default:
+                    cssclass = 'alert-info'
+            }
+            $('#alert_container').append('<div id="alert_div" class="alert ' + cssclass + ' alert-dismissible fade show"><strong>' + messagetype + '!</strong> <span>' + message + '</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+        }
+    </script>
+</head>
+<body style="padding-top: 80px;" data-bs-spy="scroll" data-bs-target="#nav-menu-top" data-bs-offset="0" class="scrollspy-example" tabindex="0">
+    <!-- schermata di attesa del salvataggio della pratica -->
+    <div id="waiting">
+        <div id="waiting-front">
+            <img src="<%= Page.ResolveUrl("~/Assets/Images/loading.svg") %>" />
+            <p>Caricamento in corso...</p>
+        </div>
+    </div>
+    <form runat="server">
+        <asp:ScriptManager runat="server">
+            <Scripts>
+                <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>
+                <%--Framework Scripts--%>
+                <asp:ScriptReference Name="MsAjaxBundle" />
+                <asp:ScriptReference Name="jquery" />
+                <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
+                <asp:ScriptReference Name="WebUIValidation.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebUIValidation.js" />
+                <asp:ScriptReference Name="MenuStandards.js" Assembly="System.Web" Path="~/Scripts/WebForms/MenuStandards.js" />
+                <asp:ScriptReference Name="GridView.js" Assembly="System.Web" Path="~/Scripts/WebForms/GridView.js" />
+                <asp:ScriptReference Name="DetailsView.js" Assembly="System.Web" Path="~/Scripts/WebForms/DetailsView.js" />
+                <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
+                <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
+                <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
+                <asp:ScriptReference Name="WebFormsBundle" />
+                <%--Site Scripts--%>
+            </Scripts>
+        </asp:ScriptManager>
+        <nav id="nav-menu-top" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Daris Cappelletti</a>
+                <button class="navbar-toggler collapsed"
+                    type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarColor01"
+                    aria-controls="navbarColor01"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse" id="navbarColor01" style="">
+                    <ul class="nav navbar-nav me-auto mb-2 mb-lg-0" id="ulProgetti" runat="server">
+                        <li class="nav-item">
+                            <a href="https://www.dariscappelletti.com" class="nav-link">HomePage
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="container body-content">
+            <div class="messagealert" id="alert_container"></div>
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+            <hr />
+            <footer>
+                <button
+                    type="button"
+                    class="btn btn-danger btn-floating btn-lg"
+                    id="btn-back-to-top">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+                <div class="row">
+                    <div class="footer-element-sx col-md-6">
+                        <p>&copy; <%: DateTime.Now.Year %> - Daris Cappelletti</p>
+                    </div>
+
+                    <div class="footer-element-dx col-md-6">
+                        <p>
+                            Sito sviluppato in C# web forms
+                    <a href="https://github.com/DarisCappelletti/Portfolio" class="badge social-pill">
+                        <i class="fa-brands fa-github-square"></i>
+                    </a>
+                        </p>
+
+                    </div>
+                </div>
+
+            </footer>
+
+            <!-- Go on top -->
+            <script>
+                //Get the button
+                let mybutton = document.getElementById("btn-back-to-top");
+
+                // When the user scrolls down 20px from the top of the document, show the button
+                window.onscroll = function () {
+                    scrollFunction();
+                };
+
+                function scrollFunction() {
+                    if (
+                        document.body.scrollTop > 20 ||
+                        document.documentElement.scrollTop > 20
+                    ) {
+                        mybutton.style.display = "block";
+                    } else {
+                        mybutton.style.display = "none";
+                    }
+                }
+                // When the user clicks on the button, scroll to the top of the document
+                mybutton.addEventListener("click", backToTop);
+
+                function backToTop() {
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+                }
+            </script>
+
+            <script>
+                // Abilito popper ovunque
+                $(function () {
+                    $("[data-bs-toggle='tooltip']").tooltip();
+                });
+
+                // waiting
+                function showLoading() {
+                    $('#waiting').addClass('show')
+                    $('#waiting-front').addClass('show')
+                    return true
+                }
+            </script>
+        </div>
+
+    </form>
+</body>
+</html>
