@@ -10,6 +10,7 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -36,9 +37,26 @@ namespace Gff3_tools
                         valoriNonContiene.Value = Session["noncontiene"].ToString();
                     }
 
-                    aggiornaTabella(dati);
+                    aggiornaTabella(impostaFiltri());
                 }
                 visualizzaFileCaricato(false);
+                ImpostaVisibilitaBottoni();
+            }
+        }
+
+        private void ImpostaVisibilitaBottoni()
+        {
+            if (Session["data"] == null)
+            {
+                divFileAggiuntivi.Visible = false;
+                CardEsportazione.Visible = false;
+                CardFiltri.Visible = false;
+            }
+            else
+            {
+                divFileAggiuntivi.Visible = true;
+                CardEsportazione.Visible = true;
+                CardFiltri.Visible = true;
             }
         }
 
@@ -148,17 +166,35 @@ namespace Gff3_tools
             //Bind the DataTable.
             aggiornaTabella(listaTizi);
             visualizzaFileCaricato(true);
+            ImpostaVisibilitaBottoni();
         }
 
         public List<SearchResult> SearchSamplesIMicrobe(string valoreDaRicercare)
         {
+            int tentativi = 3;
             try
             {
-                return APISearchSamplesIMicrobe(valoreDaRicercare);
+                if(tentativi > 0)
+                {
+                    tentativi--;
+                    return APISearchSamplesIMicrobe(valoreDaRicercare);
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch
             {
-                return APISearchSamplesIMicrobe(valoreDaRicercare);
+                if(tentativi > 0)
+                {
+                    tentativi--;
+                    return APISearchSamplesIMicrobe(valoreDaRicercare);
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -242,31 +278,66 @@ namespace Gff3_tools
         protected void ImportFasta(object sender, EventArgs e)
         {
             List<BioTizio> dati = Session["data"] as List<BioTizio>;
+            var arrayRigheSelezionate = GetRigheSelezionate();
+            var listaFiltrata = impostaFiltri();
+            var datiOrdinati = OrdinaTabella(listaFiltrata);
+            var datiFiltrati = arrayRigheSelezionate.Length == 0 ? datiOrdinati : FiltraListaPerSelezionati(datiOrdinati, arrayRigheSelezionate);
 
             var listaFile = new List<string>();
 
+            List<string> cdsFound = new List<string>();
             if (fileCaricatoFasta.HasFiles)
             {
+                var listaSequid = datiFiltrati.Select(x => x.Sequid).Distinct().Select(x => new RicercaSequid { sequid = x, Trovato = false }).ToList();
+
                 foreach (HttpPostedFile uploadedFile in fileCaricatoFasta.PostedFiles)
                 {
-                    listaFile.Add(uploadedFile.FileName);
-
-                    StreamReader inputStreamReader = new StreamReader(uploadedFile.InputStream);
-                    string streamFile = inputStreamReader.ReadToEnd();
-
-                    //Execute a loop over the rows.
-                    foreach (string row in streamFile.Split('>'))
+                    using (StreamReader reader = new StreamReader(uploadedFile.InputStream))
                     {
-                        // Se la riga non è vuota e non è un commento la aggiungo
-                        if (!string.IsNullOrEmpty(row) && !row.StartsWith("#"))
+                        string line;
+
+                        bool keywordFound = false; // Flag per indicare se la parola chiave corrente è stata trovata nel file corrente
+                        string cds = "";
+                        string sequidFound = "";
+                        while ((line = reader.ReadLine()) != null && listaSequid.Any(x => !x.Trovato))
                         {
-                            // splitto i valori per prendere la prima riga dove è presente il sequid
-                            var split = row.Split('\n');
+                            if (line.StartsWith(">"))
+                            {
+                                if (keywordFound)
+                                {
+                                    foreach (var dato in dati)
+                                        if (dato.Sequid.Contains(sequidFound))
+                                        {
+                                            dato.Fasta = cds;
+                                        }
+                                    cds = "";
+                                    sequidFound = "";
+                                }
+                                
+                                keywordFound = false;
 
-                            var split2 = split[0].Split('|');
-                            //dati = dati.Where(x => x.Sequid.Contains($"{split2[2]}|{split2[3]}")).Select(x => { x.Fasta = row; return x; }).ToList();
-                            dati.Where(x => x.Sequid.Split('_')[0] == $"{split2[2]}|{split2[3]}").ToList().ForEach(x => x.Fasta = row);
+                                var split = line.Split('|');
+                                string sequid = $"{split[2]}|{split[3]}";
 
+                                // verifico se la riga che sto controllando è quella del sequid e se il sequid è nella mia lista
+                                if (listaSequid.Any(s => s.sequid.StartsWith(sequid)))
+                                {
+                                    sequidFound = sequid;
+                                    cds += line;
+                                    keywordFound = true;
+                                    foreach (var seq in listaSequid)
+                                        if (seq.sequid == sequid)
+                                            seq.Trovato = true;
+                                }
+                            }
+                            else if (keywordFound)
+                            {
+                                cds += line;
+                            }
+
+                            // Break the loop if the delimiter is found in the line
+                            if (listaSequid.All(x => x.Trovato))
+                                break;
                         }
                     }
                 }
@@ -275,38 +346,76 @@ namespace Gff3_tools
             Session["data"] = dati;
 
             //Bind the DataTable.
-            aggiornaTabella(dati);
-            visualizzaFileCaricato(false);
+            aggiornaTabella(impostaFiltri());
+            visualizzaFileCaricato(true);
         }
 
         protected void ImportCDS(object sender, EventArgs e)
         {
             List<BioTizio> dati = Session["data"] as List<BioTizio>;
+            var arrayRigheSelezionate = GetRigheSelezionate();
+            var listaFiltrata = impostaFiltri();
+            var datiOrdinati = OrdinaTabella(listaFiltrata);
+            var datiFiltrati = arrayRigheSelezionate.Length == 0 ? datiOrdinati : FiltraListaPerSelezionati(datiOrdinati, arrayRigheSelezionate);
 
             var listaFile = new List<string>();
 
+            List<string> cdsFound = new List<string>();
             if (fileCaricatoCDS.HasFiles)
             {
+                var listaSequid = datiFiltrati.Select(x => x.Sequid).Distinct().Select(x => new RicercaSequid{ sequid = x, Trovato = false }).ToList();
+
                 foreach (HttpPostedFile uploadedFile in fileCaricatoCDS.PostedFiles)
                 {
-                    listaFile.Add(uploadedFile.FileName);
-
-                    StreamReader inputStreamReader = new StreamReader(uploadedFile.InputStream);
-                    string streamFile = inputStreamReader.ReadToEnd();
-
-                    //Execute a loop over the rows.
-                    foreach (string row in streamFile.Split('>'))
+                    using (StreamReader reader = new StreamReader(uploadedFile.InputStream))
                     {
-                        // Se la riga non è vuota e non è un commento la aggiungo
-                        if (!string.IsNullOrEmpty(row) && !row.StartsWith("#"))
+                        string line;
+
+                        bool keywordFound = false; // Flag per indicare se la parola chiave corrente è stata trovata nel file corrente
+                        string cds = "";
+                        string sequidFound = "";
+                        while ((line = reader.ReadLine()) != null && listaSequid.Any(x => !x.Trovato))
                         {
-                            // splitto i valori per prendere la prima riga dove è presente il sequid
-                            var split = row.Split('\n');
+                            if (line.StartsWith(">"))
+                            {
+                                if (keywordFound)
+                                {
+                                    foreach (var dato in dati)
+                                        if(dato.Sequid == sequidFound)
+                                        {
+                                            dato.CDS = cds;
+                                        }
+                                    cds = "";
+                                    sequidFound = "";
+                                }
 
-                            var split2 = split[0].Split(' ');
-                            //dati = dati.Where(x => x.Sequid.Contains($"{split2[2]}|{split2[3]}")).Select(x => { x.Fasta = row; return x; }).ToList();
-                            dati.Where(x => x.Sequid == split2[0]).ToList().ForEach(x => x.CDS = row);
+                                keywordFound = false;
+                                // Rimuovi il carattere ">" iniziale
+                                string trimmedInput = line.TrimStart('>');
+                                // Trova l'indice del primo spazio in modo da rimuovere la parte successiva
+                                int spaceIndex = trimmedInput.IndexOf(' ');
+                                // Estrai la sottostringa fino all'indice dello spazio
+                                string sequid = trimmedInput.Substring(0, spaceIndex);
 
+                                // verifico se la riga che sto controllando è quella del sequid e se il sequid è nella mia lista
+                                if (listaSequid.Any(s => s.sequid == sequid))
+                                {
+                                    sequidFound = sequid;
+                                    cds += line;
+                                    keywordFound = true;
+                                    foreach (var seq in listaSequid)
+                                        if(seq.sequid == sequid)
+                                            seq.Trovato = true;
+                                }
+                            }
+                            else if (keywordFound)
+                            {
+                                cds += line;
+                            }
+
+                            // Break the loop if the delimiter is found in the line
+                            if (listaSequid.All(x => x.Trovato))
+                                break;
                         }
                     }
                 }
@@ -315,14 +424,13 @@ namespace Gff3_tools
             Session["data"] = dati;
 
             //Bind the DataTable.
-            aggiornaTabella(dati);
-            visualizzaFileCaricato(false);
+            aggiornaTabella(impostaFiltri());
+            visualizzaFileCaricato(true);
         }
 
         public void btnSearch_Click(object sender, EventArgs e)
         {
-            var dati = impostaFiltri();
-            aggiornaTabella(dati);
+            aggiornaTabella(impostaFiltri());
         }
 
         public List<BioTizio> impostaFiltri()
@@ -524,55 +632,55 @@ namespace Gff3_tools
             }
         }
 
-        protected void btnEsportaExcel_Click(object sender, EventArgs e)
-        {
-            ExportGridToExcel();
-        }
+        //protected void btnEsportaExcel_Click(object sender, EventArgs e)
+        //{
+        //    ExportGridToExcel();
+        //}
 
         protected void btnEsportaGFF3_Click(object sender, EventArgs e)
         {
-            ExportToGFF3(gdvBiocoso, "prova.xls");
+            ExportToGFF3(gdvBiocoso, "Gff3 file merged - " + DateTime.Now.ToShortDateString());
         }
 
-        private void ExportGridToExcel()
-        {
-            gdvBiocoso.AllowPaging = false;
-            var dati = impostaFiltri();
-            aggiornaTabella(dati);
+        //private void ExportGridToExcel()
+        //{
+        //    gdvBiocoso.AllowPaging = false;
+        //    var dati = impostaFiltri();
+        //    aggiornaTabella(dati);
 
-            gdvBiocoso.BorderStyle = BorderStyle.Solid;
-            gdvBiocoso.BorderWidth = 1;
-            gdvBiocoso.BackColor = Color.WhiteSmoke;
-            gdvBiocoso.GridLines = GridLines.Both;
-            gdvBiocoso.Font.Name = "Verdana";
-            gdvBiocoso.Font.Size = FontUnit.XXSmall;
-            gdvBiocoso.HeaderStyle.BackColor = Color.DimGray;
-            gdvBiocoso.HeaderStyle.ForeColor = Color.White;
-            gdvBiocoso.RowStyle.HorizontalAlign = HorizontalAlign.Left;
-            gdvBiocoso.RowStyle.VerticalAlign = VerticalAlign.Top;
+        //    gdvBiocoso.BorderStyle = BorderStyle.Solid;
+        //    gdvBiocoso.BorderWidth = 1;
+        //    gdvBiocoso.BackColor = Color.WhiteSmoke;
+        //    gdvBiocoso.GridLines = GridLines.Both;
+        //    gdvBiocoso.Font.Name = "Verdana";
+        //    gdvBiocoso.Font.Size = FontUnit.XXSmall;
+        //    gdvBiocoso.HeaderStyle.BackColor = Color.DimGray;
+        //    gdvBiocoso.HeaderStyle.ForeColor = Color.White;
+        //    gdvBiocoso.RowStyle.HorizontalAlign = HorizontalAlign.Left;
+        //    gdvBiocoso.RowStyle.VerticalAlign = VerticalAlign.Top;
 
-            string FileName = "Gff3ToExcel_" + DateTime.Now + ".xls";
-            HttpResponse response = HttpContext.Current.Response;
-            response.Clear();
-            response.Charset = "";
-            response.ContentType = "application/vnd.ms-excel";
-            Response.ContentEncoding = Encoding.UTF8;
-            Response.AddHeader("Content-Disposition", "attachment;filename=" + FileName);
+        //    string FileName = "Gff3ToExcel_" + DateTime.Now + ".xls";
+        //    HttpResponse response = HttpContext.Current.Response;
+        //    response.Clear();
+        //    response.Charset = "";
+        //    response.ContentType = "application/vnd.ms-excel";
+        //    Response.ContentEncoding = Encoding.UTF8;
+        //    Response.AddHeader("Content-Disposition", "attachment;filename=" + FileName);
 
-            using (var sw = new StringWriter())
-            {
-                using (var htw = new HtmlTextWriter(sw))
-                {
-                    gdvBiocoso.RenderControl(htw);
-                    response.Write(sw.ToString());
-                    response.End();
+        //    using (var sw = new StringWriter())
+        //    {
+        //        using (var htw = new HtmlTextWriter(sw))
+        //        {
+        //            gdvBiocoso.RenderControl(htw);
+        //            response.Write(sw.ToString());
+        //            response.End();
 
-                    gdvBiocoso.AllowPaging = true;
-                    var datiNuovi = impostaFiltri();
-                    aggiornaTabella(datiNuovi);
-                }
-            }
-        }
+        //            gdvBiocoso.AllowPaging = true;
+        //            var datiNuovi = impostaFiltri();
+        //            aggiornaTabella(datiNuovi);
+        //        }
+        //    }
+        //}
 
         protected void ExportToNewExcel_Click(object sender, EventArgs e)
         {
@@ -644,7 +752,7 @@ namespace Gff3_tools
             foreach (GridViewRow row in gdvBiocoso.Rows)
             {
                 CheckBox checkBox = row.FindControl("chkSelezione") as CheckBox;
-                var boh = row.FindControl("chkSelezione");
+
                 if (checkBox != null && checkBox.Checked)
                 {
                     int rowIndex = row.RowIndex;
@@ -676,49 +784,39 @@ namespace Gff3_tools
 
         public void ExportToGFF3(GridView gridView, string fileName)
         {
-            HttpContext.Current.Response.Clear();
-            HttpContext.Current.Response.Buffer = true;
-            HttpContext.Current.Response.AddHeader("content-disposition", "attachment;filename=" + fileName);
-            HttpContext.Current.Response.Charset = "";
-            HttpContext.Current.Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            var arrayRigheSelezionate = GetRigheSelezionate();
+            var dati = impostaFiltri();
+            var datiOrdinati = OrdinaTabella(dati);
+            var listaFinale = arrayRigheSelezionate.Length == 0 ? datiOrdinati : FiltraListaPerSelezionati(datiOrdinati, arrayRigheSelezionate);
 
-            using (var package = new ExcelPackage())
+            string gff3String = "##gff-version 3\n";
+
+            if(listaFinale != null)
             {
-                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
-
-                // Set header row style
-                using (var headerRange = worksheet.Cells[1, 1, 1, gridView.Columns.Count])
+                foreach(var riga in listaFinale)
                 {
-                    headerRange.Style.Font.Bold = true;
-                    headerRange.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                    headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
-                }
-
-                // Fill header row with column names
-                for (int i = 0; i < gridView.Columns.Count; i++)
-                {
-                    worksheet.Cells[1, i + 1].Value = gridView.Columns[i].HeaderText;
-                }
-
-                // Fill data rows
-                for (int row = 0; row < gridView.Rows.Count; row++)
-                {
-                    for (int col = 0; col < gridView.Columns.Count; col++)
-                    {
-                        worksheet.Cells[row + 2, col + 1].Value = gridView.Rows[row].Cells[col].Text;
-                    }
-                }
-
-                using (var memoryStream = new MemoryStream())
-                {
-                    package.SaveAs(memoryStream);
-                    memoryStream.Position = 0;
-                    memoryStream.CopyTo(HttpContext.Current.Response.OutputStream);
+                    var attributi = string.Join(";", riga.Attributes);
+                    var stringRiga = $"{riga.Sequid}\t{riga.Source}\t{riga.Type}\t{riga.Start}\t{riga.End}\t{riga.Score}\t{riga.Strand}\t{riga.Phase}\t{attributi}\n";
+                    gff3String += stringRiga;
                 }
             }
 
-            HttpContext.Current.Response.Flush();
-            HttpContext.Current.Response.End();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                // Conversione della stringa GFF3 in array di byte
+                byte[] gff3Bytes = Encoding.UTF8.GetBytes(gff3String);
+
+                // Scrittura dell'array di byte nel flusso di memoria
+                ms.Write(gff3Bytes, 0, gff3Bytes.Length);
+
+                // Impostazione della risposta HTTP
+                HttpContext.Current.Response.Clear();
+                HttpContext.Current.Response.ContentType = "text/plain";
+                HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName + ".gff3");
+                HttpContext.Current.Response.BinaryWrite(ms.ToArray());
+                HttpContext.Current.Response.Flush();
+                HttpContext.Current.Response.End();
+            }
         }
 
         public void mostraNascondiColonne(object sender, EventArgs e)
@@ -728,58 +826,57 @@ namespace Gff3_tools
 
             if (button.CommandName == "1")
             {
-                grid.Columns[0].Visible = grid.Columns[0].Visible == true ? false : true;
-                aggiornaBottoni(button, grid.Columns[0].Visible);
-            }
-            else if (button.CommandName == "2")
-            {
                 grid.Columns[1].Visible = grid.Columns[1].Visible == true ? false : true;
                 aggiornaBottoni(button, grid.Columns[1].Visible);
             }
-            else if (button.CommandName == "3")
-            {
-                grid.Columns[2].Visible = grid.Columns[2].Visible == true ? false : true;
-                aggiornaBottoni(button, grid.Columns[2].Visible);
-            }
             else if (button.CommandName == "4")
-            {
-                grid.Columns[3].Visible = grid.Columns[3].Visible == true ? false : true;
-                aggiornaBottoni(button, grid.Columns[3].Visible);
-            }
-            else if (button.CommandName == "5")
             {
                 grid.Columns[4].Visible = grid.Columns[4].Visible == true ? false : true;
                 aggiornaBottoni(button, grid.Columns[4].Visible);
             }
-            else if (button.CommandName == "6")
+            else if (button.CommandName == "5")
             {
                 grid.Columns[5].Visible = grid.Columns[5].Visible == true ? false : true;
                 aggiornaBottoni(button, grid.Columns[5].Visible);
             }
-            else if (button.CommandName == "7")
+            else if (button.CommandName == "6")
             {
                 grid.Columns[6].Visible = grid.Columns[6].Visible == true ? false : true;
                 aggiornaBottoni(button, grid.Columns[6].Visible);
             }
-            else if (button.CommandName == "8")
+            else if (button.CommandName == "7")
             {
                 grid.Columns[7].Visible = grid.Columns[7].Visible == true ? false : true;
                 aggiornaBottoni(button, grid.Columns[7].Visible);
             }
-            else if (button.CommandName == "9")
+            else if (button.CommandName == "8")
             {
                 grid.Columns[8].Visible = grid.Columns[8].Visible == true ? false : true;
                 aggiornaBottoni(button, grid.Columns[8].Visible);
             }
-            else if (button.CommandName == "10")
+            else if (button.CommandName == "9")
             {
                 grid.Columns[9].Visible = grid.Columns[9].Visible == true ? false : true;
                 aggiornaBottoni(button, grid.Columns[9].Visible);
             }
+            else if (button.CommandName == "10")
+            {
+                grid.Columns[10].Visible = grid.Columns[10].Visible == true ? false : true;
+                aggiornaBottoni(button, grid.Columns[10].Visible);
+            }
+            else if (button.CommandName == "11")
+            {
+                grid.Columns[11].Visible = grid.Columns[11].Visible == true ? false : true;
+                aggiornaBottoni(button, grid.Columns[11].Visible);
+            }
+            else if (button.CommandName == "12")
+            {
+                grid.Columns[12].Visible = grid.Columns[12].Visible == true ? false : true;
+                aggiornaBottoni(button, grid.Columns[12].Visible);
+            }
 
             //Bind the DataTable.
-            var dati = impostaFiltri();
-            aggiornaTabella(dati);
+            aggiornaTabella(impostaFiltri());
         }
 
         public void aggiornaBottoni(Button button, bool attivo)
@@ -795,21 +892,11 @@ namespace Gff3_tools
 
         protected void ddlNumeroRisultati_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (ddlNumeroPagine.SelectedValue == "all")
-            {
-                List<BioTizio> dati = Session["data"] as List<BioTizio>;
-                gdvBiocoso.PageSize = dati.Count;
-                var datiFiltrati = impostaFiltri();
-                aggiornaTabella(datiFiltrati);
-            }
-            else
-            {
-                List<BioTizio> dati = Session["data"] as List<BioTizio>;
-                gdvBiocoso.PageSize = Convert.ToInt32(ddlNumeroPagine.SelectedValue);
-                gdvBiocoso.DataSource = dati;
-                var datiFiltrati = impostaFiltri();
-                aggiornaTabella(datiFiltrati);
-            }
+            List<BioTizio> dati = Session["data"] as List<BioTizio>;
+            gdvBiocoso.PageSize = Convert.ToInt32(ddlNumeroPagine.SelectedValue);
+            gdvBiocoso.DataSource = dati;
+
+            aggiornaTabella(impostaFiltri());
         }
 
         private void GridViewSortDirection(GridView g, GridViewSortEventArgs e, out SortDirection d, out string f)
@@ -832,6 +919,7 @@ namespace Gff3_tools
                 g.Attributes["CurrentSortField"] = f;
                 g.Attributes["CurrentSortDir"] = (d == SortDirection.Ascending ? "DESC" : "ASC");
 
+                impostaFiltri();
                 var tab = OrdinaTabella();
                 aggiornaTabella(tab);
             }
@@ -940,8 +1028,7 @@ namespace Gff3_tools
             colonna8.CssClass = "btn btn-danger";
             colonna9.CssClass = "btn btn-danger";
 
-            var datiFiltrati = impostaFiltri();
-            aggiornaTabella(datiFiltrati);
+            aggiornaTabella(impostaFiltri());
         }
     }
 
@@ -1115,5 +1202,10 @@ namespace Gff3_tools
         public string type { get; set; }
     }
 
-
+    // Ricerca sequid
+    public class RicercaSequid
+    {
+        public string sequid { get; set; }
+        public bool Trovato { get; set; }
+    }
 }

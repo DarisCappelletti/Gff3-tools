@@ -69,6 +69,15 @@ namespace Gff3_tools
         protected global::System.Web.UI.WebControls.Repeater repBtnModalFile;
 
         /// <summary>
+        /// Controllo divFileAggiuntivi.
+        /// </summary>
+        /// <remarks>
+        /// Campo generato automaticamente.
+        /// Per la modifica, spostare la dichiarazione di campo dal file di progettazione al file code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divFileAggiuntivi;
+
+        /// <summary>
         /// Controllo fileCaricatoFasta.
         /// </summary>
         /// <remarks>
@@ -121,6 +130,15 @@ namespace Gff3_tools
         /// Per la modifica, spostare la dichiarazione di campo dal file di progettazione al file code-behind.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal Literal2;
+
+        /// <summary>
+        /// Controllo CardFiltri.
+        /// </summary>
+        /// <remarks>
+        /// Campo generato automaticamente.
+        /// Per la modifica, spostare la dichiarazione di campo dal file di progettazione al file code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CardFiltri;
 
         /// <summary>
         /// Controllo lblFiltro.
@@ -195,13 +213,13 @@ namespace Gff3_tools
         protected global::System.Web.UI.WebControls.Button btnEliminaFiltri;
 
         /// <summary>
-        /// Controllo btnEsportaExcel.
+        /// Controllo CardEsportazione.
         /// </summary>
         /// <remarks>
         /// Campo generato automaticamente.
         /// Per la modifica, spostare la dichiarazione di campo dal file di progettazione al file code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnEsportaExcel;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CardEsportazione;
 
         /// <summary>
         /// Controllo btnEsportaGff3.
@@ -213,13 +231,13 @@ namespace Gff3_tools
         protected global::System.Web.UI.WebControls.Button btnEsportaGff3;
 
         /// <summary>
-        /// Controllo Button1.
+        /// Controllo btnEsportaExcel.
         /// </summary>
         /// <remarks>
         /// Campo generato automaticamente.
         /// Per la modifica, spostare la dichiarazione di campo dal file di progettazione al file code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button1;
+        protected global::System.Web.UI.WebControls.Button btnEsportaExcel;
 
         /// <summary>
         /// Controllo stato.
