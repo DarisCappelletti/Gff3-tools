@@ -54,9 +54,12 @@ namespace Gff3_tools
             }
             else
             {
+                List<BioTizio> dati = Session["data"] as List<BioTizio>;
+
                 divFileAggiuntivi.Visible = true;
                 CardEsportazione.Visible = true;
                 CardFiltri.Visible = true;
+                btnEsportaCds.Visible = dati.Any(x => !String.IsNullOrWhiteSpace(x.CDS));
             }
         }
 
@@ -401,7 +404,7 @@ namespace Gff3_tools
                                 if (listaSequid.Any(s => s.sequid == sequid))
                                 {
                                     sequidFound = sequid;
-                                    cds += line;
+                                    cds += line + "\n";
                                     keywordFound = true;
                                     foreach (var seq in listaSequid)
                                         if(seq.sequid == sequid)
@@ -410,7 +413,7 @@ namespace Gff3_tools
                             }
                             else if (keywordFound)
                             {
-                                cds += line;
+                                cds += line + "\n";
                             }
 
                             // Break the loop if the delimiter is found in the line
@@ -426,6 +429,7 @@ namespace Gff3_tools
             //Bind the DataTable.
             aggiornaTabella(impostaFiltri());
             visualizzaFileCaricato(true);
+            ImpostaVisibilitaBottoni();
         }
 
         public void btnSearch_Click(object sender, EventArgs e)
@@ -642,6 +646,11 @@ namespace Gff3_tools
             ExportToGFF3(gdvBiocoso, "Gff3 file merged - " + DateTime.Now.ToShortDateString());
         }
 
+        protected void btnEsportaCDS_Click(object sender, EventArgs e)
+        {
+            ExportToCDS(gdvBiocoso, "CDS file merged - " + DateTime.Now.ToShortDateString());
+        }
+
         //private void ExportGridToExcel()
         //{
         //    gdvBiocoso.AllowPaging = false;
@@ -813,6 +822,50 @@ namespace Gff3_tools
                 HttpContext.Current.Response.Clear();
                 HttpContext.Current.Response.ContentType = "text/plain";
                 HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName + ".gff3");
+                HttpContext.Current.Response.BinaryWrite(ms.ToArray());
+                HttpContext.Current.Response.Flush();
+                HttpContext.Current.Response.End();
+            }
+        }
+
+        
+        public void ExportToCDS(GridView gridView, string fileName)
+        {
+            var arrayRigheSelezionate = GetRigheSelezionate();
+            var dati = impostaFiltri();
+            var datiOrdinati = OrdinaTabella(dati);
+            var listaFinale = arrayRigheSelezionate.Length == 0 ? datiOrdinati : FiltraListaPerSelezionati(datiOrdinati, arrayRigheSelezionate);
+
+            var listaRighe = listaFinale.Select(x => x.CDS).Distinct().ToArray();
+            listaRighe = listaRighe.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+            //for (int i = 0; i < listaRighe.Length; i++)
+            //{
+            //    if (listaRighe[i].Length > 100)
+            //    {
+            //        string[] stringheDivise = listaRighe[i].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            //        listaRighe[i] = stringheDivise[0];
+
+            //        List<string> stringheAggiuntive = new List<string>(stringheDivise);
+            //        stringheAggiuntive.RemoveAt(0);
+            //        listaRighe = InserisciElementi(listaRighe, i + 1, stringheAggiuntive);
+            //    }
+            //}
+
+            var stringaFinale = string.Join("", listaRighe);
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                // Conversione della stringa GFF3 in array di byte
+                byte[] CDSBytes = Encoding.UTF8.GetBytes(stringaFinale);
+
+                // Scrittura dell'array di byte nel flusso di memoria
+                ms.Write(CDSBytes, 0, CDSBytes.Length);
+
+                // Impostazione della risposta HTTP
+                HttpContext.Current.Response.Clear();
+                HttpContext.Current.Response.ContentType = "text/plain";
+                HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName + ".cds.fa");
                 HttpContext.Current.Response.BinaryWrite(ms.ToArray());
                 HttpContext.Current.Response.Flush();
                 HttpContext.Current.Response.End();

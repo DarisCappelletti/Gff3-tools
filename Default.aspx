@@ -520,6 +520,12 @@
                                 Text="Esporta GFF3"
                                 OnClick="btnEsportaGFF3_Click" />
                             <asp:Button
+                                ID="btnEsportaCds"
+                                runat="server"
+                                CssClass="btn btn-secondary btn-operazioni me-2"
+                                Text="Esporta CDS"
+                                OnClick="btnEsportaCDS_Click" />
+                            <asp:Button
                                 ID="btnEsportaExcel"
                                 runat="server"
                                 CssClass="btn btn-secondary btn-operazioni"
