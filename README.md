@@ -27,8 +27,8 @@ This tool is released under the [GNU General Public License v3.0]. Please see th
 
 For additional information or questions, please contact the project author:
 
-- Name: [Cappelletti Daris]
-- Email: [dariscappelletti@gmail.com]
+- Name: Cappelletti Daris
+- Email: dariscappelletti@gmail.com
 - Website: [dariscappelletti.com](https://dariscappelletti.com/)
 
 Feel free to reach out if you have any further questions or need assistance!
