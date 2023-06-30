@@ -157,7 +157,14 @@
                 <!-- Card caricamento files -->
                 <div class="card p-3 mb-3">
                     <h5 class="card-title">File</h5>
-                    <p class="card-text">Seleziona uno o più file in formato .gff3 e clicca sul pulsante carica. I risultati verranno mostrati in un'unica tabella.</p>
+                    <p class="card-text">
+                        Seleziona uno o più file in formato .gff3 e clicca sul pulsante carica. I risultati verranno mostrati in un'unica tabella.<br />
+                        NB: Se il file è rinominato con il nome del campione verrà ricercato su Imicrobe 
+                        per estrapolare informazioni aggiuntive e permettere la visione dei download collegati.<br />
+                        (esempio: MMETSP0013.gff3)
+                        
+
+                    </p>
                     <div class="card-body">
                         <h6>Carica i file GFF3</h6>
                         <div class="row">
@@ -173,128 +180,143 @@
                                     OnClientClick="showLoading();" />
                             </div>
                             <div class="col-md-7">
-                                <asp:Literal ID="litFileCaricato" runat="server" Visible="false"></asp:Literal>
                                 <asp:Repeater ID="repBtnModalFile" runat="server">
                                     <ItemTemplate>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#samplemodal-<%# Eval("sample_id") %>">
-                                            <%# Eval("sample_description") %> (<%# Eval("sample_name") %>)
-                                        </button>
-                                        <div class="modal fade" id="samplemodal-<%# Eval("sample_id") %>" tabindex="-1" aria-labelledby="labelModal-<%# Eval("sample_id") %>" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="labelModal-<%# Eval("sample_id") %>">
-                                                            <%# Eval("sample_description") %>
-                                                            <span class="badge rounded-pill bg-warning text-dark">
-                                                                <%# Eval("sample_type") %>
-                                                            </span>
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="row">
-                                                            <div class="col-md-4 fw-bold">
-                                                                Campione
-                                                            </div>
-                                                            <div class="col-md-8">
-                                                                <%# Eval("sample_name") %>
-                                                            </div>
+                                        <div class="row">
+                                            <div class="col-md-3 fw-bold">
+                                                File attivo:
+                                            </div>
+                                            <div class="col-md-9">
+                                                <button 
+                                                    type="button" 
+                                                    <%#
+                                                        (
+                                                            Eval("sample_id") == null || (int)Eval("sample_id") != 0 
+                                                            ? $"class=\"btn btn-primary\" data-bs-toggle=\"modal\" data-bs-target=\"#samplemodal-{Eval("sample_id")}\""
+                                                            : "class=\"btn btn-secondary\""
+                                                        )
+                                                    %>
+                                                    >
+                                                    <%# Eval("sample_description") %> (<%# Eval("sample_name") %>)
+                                                </button>
+                                            </div>
+                                            <div class="modal fade" id="samplemodal-<%# Eval("sample_id") %>" tabindex="-1" aria-labelledby="labelModal-<%# Eval("sample_id") %>" aria-hidden="true">
+                                                <div class="modal-dialog modal-xl">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="labelModal-<%# Eval("sample_id") %>">
+                                                                <%# Eval("sample_description") %>
+                                                                <span class="badge rounded-pill bg-warning text-dark">
+                                                                    <%# Eval("sample_type") %>
+                                                                </span>
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
-                                                        <div class="row">
-                                                            <div class="col-md-4 fw-bold">
-                                                                Ricercatori
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                <div class="col-md-4 fw-bold">
+                                                                    Campione
+                                                                </div>
+                                                                <div class="col-md-8">
+                                                                    <%# Eval("sample_name") %>
+                                                                </div>
                                                             </div>
-                                                            <div class="col-md-8">
-                                                                <asp:Repeater runat="server" DataSource='<%# Eval("investigators") %>'>
+                                                            <div class="row">
+                                                                <div class="col-md-4 fw-bold">
+                                                                    Ricercatori
+                                                                </div>
+                                                                <div class="col-md-8">
+                                                                    <asp:Repeater runat="server" DataSource='<%# Eval("investigators") %>'>
+                                                                        <ItemTemplate>
+                                                                            <%# Eval("investigator_name") %>
+                                                                        </ItemTemplate>
+                                                                    </asp:Repeater>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="accordion mt-5" id="accordion-<%# Eval("sample_id") %>">
+                                                                <!-- files -->
+                                                                <asp:Repeater runat="server" DataSource='<%# Eval("sample_files") %>'>
+                                                                    <HeaderTemplate>
+                                                                        <div class="accordion-item">
+                                                                            <h2 class="accordion-header" id="headingFiles">
+                                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFiles" aria-expanded="true" aria-controls="headingCollapseFiles">
+                                                                                    Files
+                                                                                </button>
+                                                                            </h2>
+                                                                            <div id="collapseFiles" class="accordion-collapse collapse" aria-labelledby="headingCollapseFiles"
+                                                                                data-bs-parent="#accordion-<%# DataBinder.Eval(((RepeaterItem)Container.Parent.Parent).DataItem, "sample_id")%>">
+                                                                                <div class="accordion-body">
+                                                                                    <table class="table">
+                                                                                        <thead>
+                                                                                            <tr>
+                                                                                                <th scope="col">Nome</th>
+                                                                                                <th scope="col">Tipo</th>
+                                                                                                <th scope="col"></th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                    </HeaderTemplate>
                                                                     <ItemTemplate>
-                                                                        <%# Eval("investigator_name") %>
+                                                                        <tr>
+                                                                            <td><%# GetFileName(Eval("file")) %></td>
+                                                                            <td><%# Eval("sample_file_type.type") %></td>
+                                                                            <td><a target="_blank" class="btn btn-outline-secondary" href="http://datacommons.cyverse.org/browse/<%# Eval("file") %>">Download</a></td>
+                                                                        </tr>
                                                                     </ItemTemplate>
+                                                                    <FooterTemplate>
+                                                                        </tbody>
+                                                                    </table>
+                                                                    </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    </FooterTemplate>
+                                                                </asp:Repeater>
+
+                                                                <!-- Attributes -->
+                                                                <asp:Repeater runat="server" DataSource='<%# Eval("sample_attrs") %>'>
+                                                                    <HeaderTemplate>
+                                                                        <div class="accordion-item">
+                                                                            <h2 class="accordion-header" id="headingAttributes">
+                                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAttributes" aria-expanded="true" aria-controls="headingCollapseAttributes">
+                                                                                    Attributi
+                                                                                </button>
+                                                                            </h2>
+                                                                            <div id="collapseAttributes" class="accordion-collapse collapse" aria-labelledby="headingCollapseAttributes"
+                                                                                data-bs-parent="#accordion-<%# DataBinder.Eval(((RepeaterItem)Container.Parent.Parent).DataItem, "sample_id")%>">
+                                                                                <div class="accordion-body">
+                                                                                    <table class="table" style="table-layout: fixed;">
+                                                                                        <thead>
+                                                                                            <tr>
+                                                                                                <th scope="col">Tipo</th>
+                                                                                                <th scope="col">Valore</th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                    </HeaderTemplate>
+                                                                    <ItemTemplate>
+                                                                        <tr>
+                                                                            <td><%# Eval("sample_attr_type.sample_attr_type_category.category") %></td>
+                                                                            <td>
+                                                                                <div style="word-wrap: break-word; overflow-wrap: break-word; width: 100%;">
+                                                                                    <%# Eval("attr_value") %>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </ItemTemplate>
+                                                                    <FooterTemplate>
+                                                                        </tbody>
+                                                                    </table>
+                                                                    </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    </FooterTemplate>
                                                                 </asp:Repeater>
                                                             </div>
                                                         </div>
-
-                                                        <div class="accordion mt-5" id="accordion-<%# Eval("sample_id") %>">
-                                                            <!-- files -->
-                                                            <asp:Repeater runat="server" DataSource='<%# Eval("sample_files") %>'>
-                                                                <HeaderTemplate>
-                                                                    <div class="accordion-item">
-                                                                        <h2 class="accordion-header" id="headingFiles">
-                                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFiles" aria-expanded="true" aria-controls="headingCollapseFiles">
-                                                                                Files
-                                                                            </button>
-                                                                        </h2>
-                                                                        <div id="collapseFiles" class="accordion-collapse collapse" aria-labelledby="headingCollapseFiles"
-                                                                            data-bs-parent="#accordion-<%# DataBinder.Eval(((RepeaterItem)Container.Parent.Parent).DataItem, "sample_id")%>">
-                                                                            <div class="accordion-body">
-                                                                                <table class="table">
-                                                                                    <thead>
-                                                                                        <tr>
-                                                                                            <th scope="col">Nome</th>
-                                                                                            <th scope="col">Tipo</th>
-                                                                                            <th scope="col"></th>
-                                                                                        </tr>
-                                                                                    </thead>
-                                                                                    <tbody>
-                                                                </HeaderTemplate>
-                                                                <ItemTemplate>
-                                                                    <tr>
-                                                                        <td><%# GetFileName(Eval("file")) %></td>
-                                                                        <td><%# Eval("sample_file_type.type") %></td>
-                                                                        <td><a target="_blank" class="btn btn-outline-secondary" href="http://datacommons.cyverse.org/browse/<%# Eval("file") %>">Download</a></td>
-                                                                    </tr>
-                                                                </ItemTemplate>
-                                                                <FooterTemplate>
-                                                                    </tbody>
-                                                                    </table>
-                                                                    </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </FooterTemplate>
-                                                            </asp:Repeater>
-
-                                                            <!-- Attributes -->
-                                                            <asp:Repeater runat="server" DataSource='<%# Eval("sample_attrs") %>'>
-                                                                <HeaderTemplate>
-                                                                    <div class="accordion-item">
-                                                                        <h2 class="accordion-header" id="headingAttributes">
-                                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAttributes" aria-expanded="true" aria-controls="headingCollapseAttributes">
-                                                                                Attributi
-                                                                            </button>
-                                                                        </h2>
-                                                                        <div id="collapseAttributes" class="accordion-collapse collapse" aria-labelledby="headingCollapseAttributes"
-                                                                            data-bs-parent="#accordion-<%# DataBinder.Eval(((RepeaterItem)Container.Parent.Parent).DataItem, "sample_id")%>">
-                                                                            <div class="accordion-body">
-                                                                                <table class="table" style="table-layout: fixed;">
-                                                                                    <thead>
-                                                                                        <tr>
-                                                                                            <th scope="col">Tipo</th>
-                                                                                            <th scope="col">Valore</th>
-                                                                                        </tr>
-                                                                                    </thead>
-                                                                                    <tbody>
-                                                                </HeaderTemplate>
-                                                                <ItemTemplate>
-                                                                    <tr>
-                                                                        <td><%# Eval("sample_attr_type.sample_attr_type_category.category") %></td>
-                                                                        <td>
-                                                                            <div style="word-wrap: break-word; overflow-wrap: break-word; width: 100%;">
-                                                                                <%# Eval("attr_value") %>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                </ItemTemplate>
-                                                                <FooterTemplate>
-                                                                    </tbody>
-                                                                    </table>
-                                                                    </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </FooterTemplate>
-                                                            </asp:Repeater>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
                                                         </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
                                                     </div>
                                                 </div>
                                             </div>

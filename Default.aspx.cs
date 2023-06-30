@@ -39,7 +39,7 @@ namespace Gff3_tools
 
                     aggiornaTabella(impostaFiltri());
                 }
-                visualizzaFileCaricato(false);
+                visualizzaFileCaricato();
                 ImpostaVisibilitaBottoni();
             }
         }
@@ -97,7 +97,7 @@ namespace Gff3_tools
             {
                 foreach (HttpPostedFile uploadedFile in fileCaricato.PostedFiles)
                 {
-                    listaFile.Add(uploadedFile.FileName);
+                    listaFile.Add(Path.ChangeExtension(uploadedFile.FileName, null));
 
                     StreamReader inputStreamReader = new StreamReader(uploadedFile.InputStream);
                     string streamFile = inputStreamReader.ReadToEnd();
@@ -168,7 +168,7 @@ namespace Gff3_tools
 
             //Bind the DataTable.
             aggiornaTabella(listaTizi);
-            visualizzaFileCaricato(true);
+            visualizzaFileCaricato();
             ImpostaVisibilitaBottoni();
         }
 
@@ -350,7 +350,7 @@ namespace Gff3_tools
 
             //Bind the DataTable.
             aggiornaTabella(impostaFiltri());
-            visualizzaFileCaricato(true);
+            visualizzaFileCaricato();
         }
 
         protected void ImportCDS(object sender, EventArgs e)
@@ -428,7 +428,7 @@ namespace Gff3_tools
 
             //Bind the DataTable.
             aggiornaTabella(impostaFiltri());
-            visualizzaFileCaricato(true);
+            visualizzaFileCaricato();
             ImpostaVisibilitaBottoni();
         }
 
@@ -599,40 +599,31 @@ namespace Gff3_tools
             /* Verifies that the control is rendered */
         }
 
-        public void visualizzaFileCaricato(bool loadInfo)
+        public void visualizzaFileCaricato()
         {
             if (Session["nomeFile"] != null)
             {
                 var files = Session["nomeFile"] as List<string>;
-                litFileCaricato.Visible = true;
 
-                litFileCaricato.Text = "";
-
-                if (loadInfo)
+                var listaSamples = new List<RootSample>();
+                foreach (var file in files)
                 {
-                    var listaSamples = new List<RootSample>();
-                    foreach (var file in files)
+                    var risultati = SearchSamplesIMicrobe(file);
+
+                    var sample = risultati != null && risultati.Count == 1 ? GetSampleInfoIMicrobe(risultati.FirstOrDefault().id) : null;
+
+                    if (sample != null)
                     {
-                        litFileCaricato.Text += "<strong>File attivo:</strong> " + file + "<br>";
-
-                        var risultati = SearchSamplesIMicrobe(Path.ChangeExtension(file, null));
-
-                        var sample = risultati != null ? GetSampleInfoIMicrobe(risultati.FirstOrDefault().id) : null;
-
-                        if (sample != null)
-                        {
-                            listaSamples.Add(sample);
-                        }
+                        listaSamples.Add(sample);
                     }
-
-                    repBtnModalFile.DataSource = listaSamples;
-                    repBtnModalFile.DataBind();
+                    else
+                    {
+                        listaSamples.Add(new RootSample { sample_name = file });
+                    }
                 }
-            }
-            else
-            {
-                litFileCaricato.Text = "";
-                litFileCaricato.Visible = false;
+
+                repBtnModalFile.DataSource = listaSamples;
+                repBtnModalFile.DataBind();
             }
         }
 

@@ -51,15 +51,6 @@ namespace Gff3_tools
         protected global::System.Web.UI.WebControls.Button btnCarica;
 
         /// <summary>
-        /// Controllo litFileCaricato.
-        /// </summary>
-        /// <remarks>
-        /// Campo generato automaticamente.
-        /// Per la modifica, spostare la dichiarazione di campo dal file di progettazione al file code-behind.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litFileCaricato;
-
-        /// <summary>
         /// Controllo repBtnModalFile.
         /// </summary>
         /// <remarks>
