@@ -350,7 +350,7 @@ namespace Gff3_tools
 
             //Bind the DataTable.
             aggiornaTabella(impostaFiltri());
-            visualizzaFileCaricato();
+            //visualizzaFileCaricato();
         }
 
         protected void ImportCDS(object sender, EventArgs e)
@@ -428,7 +428,7 @@ namespace Gff3_tools
 
             //Bind the DataTable.
             aggiornaTabella(impostaFiltri());
-            visualizzaFileCaricato();
+            //visualizzaFileCaricato();
             ImpostaVisibilitaBottoni();
         }
 
