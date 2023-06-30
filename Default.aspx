@@ -187,16 +187,15 @@
                                                 File attivo:
                                             </div>
                                             <div class="col-md-9">
-                                                <button 
-                                                    type="button" 
+                                                <button
+                                                    type="button"
                                                     <%#
                                                         (
                                                             Eval("sample_id") == null || (int)Eval("sample_id") != 0 
                                                             ? $"class=\"btn btn-primary\" data-bs-toggle=\"modal\" data-bs-target=\"#samplemodal-{Eval("sample_id")}\""
                                                             : "class=\"btn btn-secondary\""
                                                         )
-                                                    %>
-                                                    >
+                                                    %>>
                                                     <%# Eval("sample_description") %> (<%# Eval("sample_name") %>)
                                                 </button>
                                             </div>
