@@ -216,6 +216,14 @@
     <Content Include="Assets\vendor\bootstrap-5.2.3\js\bootstrap.esm.min.js.map" />
     <Content Include="Assets\vendor\bootstrap-5.2.3\js\bootstrap.js.map" />
     <Content Include="Assets\vendor\bootstrap-5.2.3\js\bootstrap.min.js.map" />
+    <Content Include="Assets\vendor\font-awesome-6.4.0\webfonts\fa-brands-400.ttf" />
+    <Content Include="Assets\vendor\font-awesome-6.4.0\webfonts\fa-brands-400.woff2" />
+    <Content Include="Assets\vendor\font-awesome-6.4.0\webfonts\fa-regular-400.ttf" />
+    <Content Include="Assets\vendor\font-awesome-6.4.0\webfonts\fa-regular-400.woff2" />
+    <Content Include="Assets\vendor\font-awesome-6.4.0\webfonts\fa-solid-900.ttf" />
+    <Content Include="Assets\vendor\font-awesome-6.4.0\webfonts\fa-solid-900.woff2" />
+    <Content Include="Assets\vendor\font-awesome-6.4.0\webfonts\fa-v4compatibility.ttf" />
+    <Content Include="Assets\vendor\font-awesome-6.4.0\webfonts\fa-v4compatibility.woff2" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Properties\PublishProfiles\IISProfile.pubxml" />
     <Content Include="Site.Master" />
