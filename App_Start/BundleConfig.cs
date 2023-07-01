@@ -31,8 +31,8 @@ namespace Gff3_tools
 
             // Utilizzare la versione di sviluppo di Modernizr per eseguire attività di sviluppo ed esercizi. Successivamente, quando si è
             // pronti per passare alla produzione, usare lo strumento di compilazione disponibile all'indirizzo https://modernizr.com per selezionare solo i test necessari
-            bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
-                            "~/Scripts/modernizr-*"));
+            //bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
+            //                "~/Scripts/modernizr-*"));
         }
     }
 }
