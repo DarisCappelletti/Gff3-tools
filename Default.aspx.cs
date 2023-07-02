@@ -925,7 +925,7 @@ namespace Gff3_tools
 
         public void aggiornaBottoni(Button button, bool attivo)
         {
-            button.CssClass = attivo ? "btn btn-danger" : "btn btn-success";
+            button.CssClass = attivo ? "btn btn-success" : "btn btn-danger";
         }
 
         protected void gdvBiocoso_PageIndexChanging(object sender, GridViewPageEventArgs e)
@@ -1062,15 +1062,15 @@ namespace Gff3_tools
             }
 
             // imposto i pulsanti del mostra/nascondi colonne come attivi
-            colonna1.CssClass = "btn btn-danger";
-            colonna2.CssClass = "btn btn-danger";
-            colonna3.CssClass = "btn btn-danger";
-            colonna4.CssClass = "btn btn-danger";
-            colonna5.CssClass = "btn btn-danger";
-            colonna6.CssClass = "btn btn-danger";
-            colonna7.CssClass = "btn btn-danger";
-            colonna8.CssClass = "btn btn-danger";
-            colonna9.CssClass = "btn btn-danger";
+            colonna1.CssClass = "btn btn-success";
+            colonna2.CssClass = "btn btn-success";
+            colonna3.CssClass = "btn btn-success";
+            colonna4.CssClass = "btn btn-success";
+            colonna5.CssClass = "btn btn-success";
+            colonna6.CssClass = "btn btn-success";
+            colonna7.CssClass = "btn btn-success";
+            colonna8.CssClass = "btn btn-success";
+            colonna9.CssClass = "btn btn-success";
 
             aggiornaTabella(impostaFiltri());
         }

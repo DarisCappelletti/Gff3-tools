@@ -6,7 +6,7 @@
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%: Page.Title %> - Portfolio</title>
+    <title><%: Page.Title %></title>
 
     <!-- FontAwesome -->
     <link href="Assets/vendor/font-awesome-6.4.0/css/fontawesome.min.css" rel="stylesheet" />
@@ -16,7 +16,7 @@
     <link href="Assets/vendor/bootstrap-5.2.3/css/bootstrap.min.css" rel="stylesheet" />
 
     <asp:PlaceHolder runat="server">
-        <%: Scripts.Render("~/bundles/modernizr") %>
+       <%-- <%: Scripts.Render("~/bundles/modernizr") %>--%>
     </asp:PlaceHolder>
 
     <webopt:BundleReference runat="server" Path="~/Content/css" />
@@ -230,9 +230,6 @@
             <script src="Assets/vendor/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
             <!-- jquery -->
             <script src="Assets/vendor/jquery/jquery-3.7.0.min.js"></script>
-        <asp:ScriptManager runat="server">
-
-        </asp:ScriptManager>
         <nav id="nav-menu-top" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">Daris Cappelletti</a>
@@ -274,7 +271,7 @@
                     <div class="footer-element-dx col-md-6">
                         <p>
                             Sito sviluppato in C# web forms
-                    <a href="https://github.com/DarisCappelletti/Portfolio" class="badge social-pill">
+                    <a href="https://github.com/DarisCappelletti/Gff3-tools" class="badge social-pill">
                         <i class="fa-brands fa-github-square"></i>
                     </a>
                         </p>

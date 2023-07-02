@@ -109,6 +109,10 @@
         #gdvBiocoso a {
             color: white;
         }
+
+        #gdvBiocoso tr {
+            cursor: pointer;
+        }
     </style>
 
     <div class="container">
@@ -318,11 +322,14 @@
                         </div>
                         <div id="divFileAggiuntivi" runat="server">
                             <h6 class="mt-3">Carica i file FASTA</h6>
-                            <p>
-                                <span class="text-danger">Attenzione:</span>
-                                caricare molti file FASTA aumenterà l'elaborazione dei dati. Per evitare lunghe attese si suggerisce di filtrare i dati
-                            in base alle proprie necessità e successivamente caricare i file per aggregarli nella tabella.
-                            </p>
+                            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                <i class="bi flex-shrink-0 me-2 fa-solid fa-triangle-exclamation"></i>
+                                <div>
+                                    <strong>Attenzione:</strong> caricare molti file FASTA aumenterà l'elaborazione dei dati. 
+                                    Per evitare lunghe attese o timeout della pagina si suggerisce di filtrare i dati
+                                    in base alle proprie necessità e successivamente caricare i file per aggregarli nella tabella.
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-md-5">
                                     <asp:FileUpload ID="fileCaricatoFasta" runat="server" CssClass="form-control" AllowMultiple="true" accept=".fasta" />
@@ -341,11 +348,14 @@
                             </div>
 
                             <h6 class="mt-3">Carica i file CDS</h6>
-                            <p>
-                                <span class="text-danger">Attenzione:</span>
-                                caricare molti file cds aumenterà l'elaborazione dei dati. Per evitare lunghe attese si suggerisce di filtrare i dati
-                            in base alle proprie necessità e successivamente caricare i file per aggregarli nella tabella.
-                            </p>
+                            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                <i class="bi flex-shrink-0 me-2 fa-solid fa-triangle-exclamation"></i>
+                                <div>
+                                    <strong>Attenzione:</strong> caricare molti file CDS aumenterà l'elaborazione dei dati. 
+                                    Per evitare lunghe attese o timeout della pagina si suggerisce di filtrare i dati
+                                    in base alle proprie necessità e successivamente caricare i file per aggregarli nella tabella.
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-md-5">
                                     <asp:FileUpload ID="fileCaricatoCDS" runat="server" CssClass="form-control" AllowMultiple="true" accept=".cds.fa" />
@@ -484,14 +494,16 @@
                                 <asp:CheckBox ID="chkSottolineaParole" runat="server" ClientIDMode="Static" />
                             </div>
                         </div>
-                        <p>
-                            <strong>Esempio: </strong>
+                        <div class="alert alert-info d-flex align-items-center" role="alert">
+                            <i class="bi flex-shrink-0 me-2 fa-solid fa-circle-info"></i>
+                                <div>
+                                    <strong>Esempio: </strong>
                             Devo filtrare i risultati in modo da avere soltanto quelli che contengono la parola "mitochondrial" nella colonna "Attributes".
                             In questo caso dovrò prima impostare la parola su "Contiene" e cliccare su "Aggiungi" per confermare, successivamente,
                             in "Ricerca in" rimuovo la spunta da tutte le checkbox lasciando attiva soltanto quella di "Attributes".
                             Infine clicco sul pulsante "Applica i filtri" per avviare la ricerca dei risultati.
-                        </p>
-
+                                </div>
+                            </div>
                         <div style="display: inline-flex;">
                             <asp:Button
                                 ID="btnRicerca"
@@ -563,16 +575,16 @@
                     <asp:Label ID="lblPulsantiColonne" runat="server"><strong>Mostra/Nascondi colonne:</strong></asp:Label>
                 </div>
                 <div class="col-md-8">
-                    <asp:Button ID="colonna0" runat="server" CommandName="1" OnClick="mostraNascondiColonne" Text="File" CssClass="btn btn-danger" OnClientClick="showLoading();" />
-                    <asp:Button ID="colonna1" runat="server" CommandName="4" OnClick="mostraNascondiColonne" Text="Sequid" CssClass="btn btn-danger" OnClientClick="showLoading();" />
-                    <asp:Button ID="colonna2" runat="server" CommandName="5" OnClick="mostraNascondiColonne" Text="Source" CssClass="btn btn-danger" OnClientClick="showLoading();" />
-                    <asp:Button ID="colonna3" runat="server" CommandName="6" OnClick="mostraNascondiColonne" Text="Type" CssClass="btn btn-danger" OnClientClick="showLoading();" />
-                    <asp:Button ID="colonna4" runat="server" CommandName="7" OnClick="mostraNascondiColonne" Text="Start" CssClass="btn btn-danger" OnClientClick="showLoading();" />
-                    <asp:Button ID="colonna5" runat="server" CommandName="8" OnClick="mostraNascondiColonne" Text="End" CssClass="btn btn-danger" OnClientClick="showLoading();" />
-                    <asp:Button ID="colonna6" runat="server" CommandName="9" OnClick="mostraNascondiColonne" Text="Score" CssClass="btn btn-danger" OnClientClick="showLoading();" />
-                    <asp:Button ID="colonna7" runat="server" CommandName="10" OnClick="mostraNascondiColonne" Text="Strand" CssClass="btn btn-danger" OnClientClick="showLoading();" />
-                    <asp:Button ID="colonna8" runat="server" CommandName="11" OnClick="mostraNascondiColonne" Text="Phase" CssClass="btn btn-danger" OnClientClick="showLoading();" />
-                    <asp:Button ID="colonna9" runat="server" CommandName="12" OnClick="mostraNascondiColonne" Text="Attributes" CssClass="btn btn-danger" OnClientClick="showLoading();" />
+                    <asp:Button ID="colonna0" runat="server" CommandName="1" OnClick="mostraNascondiColonne" Text="File" CssClass="btn btn-success" OnClientClick="showLoading();" />
+                    <asp:Button ID="colonna1" runat="server" CommandName="4" OnClick="mostraNascondiColonne" Text="Sequid" CssClass="btn btn-success" OnClientClick="showLoading();" />
+                    <asp:Button ID="colonna2" runat="server" CommandName="5" OnClick="mostraNascondiColonne" Text="Source" CssClass="btn btn-success" OnClientClick="showLoading();" />
+                    <asp:Button ID="colonna3" runat="server" CommandName="6" OnClick="mostraNascondiColonne" Text="Type" CssClass="btn btn-success" OnClientClick="showLoading();" />
+                    <asp:Button ID="colonna4" runat="server" CommandName="7" OnClick="mostraNascondiColonne" Text="Start" CssClass="btn btn-success" OnClientClick="showLoading();" />
+                    <asp:Button ID="colonna5" runat="server" CommandName="8" OnClick="mostraNascondiColonne" Text="End" CssClass="btn btn-success" OnClientClick="showLoading();" />
+                    <asp:Button ID="colonna6" runat="server" CommandName="9" OnClick="mostraNascondiColonne" Text="Score" CssClass="btn btn-success" OnClientClick="showLoading();" />
+                    <asp:Button ID="colonna7" runat="server" CommandName="10" OnClick="mostraNascondiColonne" Text="Strand" CssClass="btn btn-success" OnClientClick="showLoading();" />
+                    <asp:Button ID="colonna8" runat="server" CommandName="11" OnClick="mostraNascondiColonne" Text="Phase" CssClass="btn btn-success" OnClientClick="showLoading();" />
+                    <asp:Button ID="colonna9" runat="server" CommandName="12" OnClick="mostraNascondiColonne" Text="Attributes" CssClass="btn btn-success" OnClientClick="showLoading();" />
                 </div>
                 <div class="col-md-2">
                     Risultati:
@@ -1017,5 +1029,18 @@
         $(document).ready(function () {
             $("input[type=checkbox]").addClass("form-check-input");
         });
+    </script>
+
+    <!-- Click su una riga della tabella valorizza la checkbox -->
+    <script>
+        $('#gdvBiocoso tr').click(function () {
+            var checkbox = $(this).find('#chkSelezione')
+
+            if (checkbox.is(':checked')) {
+                checkbox.prop('checked', false);
+            } else {
+                checkbox.prop('checked', true);
+            }
+        })
     </script>
 </asp:Content>
