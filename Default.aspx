@@ -21,7 +21,6 @@
         }
 
         p {
-            font-style: italic;
             font-weight: lighter;
         }
 
@@ -118,8 +117,16 @@
     <div class="container">
         <asp:Literal ID="messaggio" runat="server"></asp:Literal>
         <div>
-            <h1>Gff3 Tools</h1>
-            <h2>Strumenti per lo studio di file in formato .gff3</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <h1><i class="fa-solid fa-dna"></i> Gff3 Tools</h1>
+                    <h2>Strumenti per lo studio di file in formato .gff3</h2>
+                </div>
+                <div class="col-md-4 text-end">
+                    <p class="fst-normal mb-0"><strong>Creato da:</strong> Cappelletti Daris <i class="fa-solid fa-user-secret"></i></p>
+                    <p class="fst-normal"><strong>Collaboratrice:</strong> Cavalletti Elena <i class="fa-solid fa-user-graduate"></i></p>
+                </div>
+            </div>
             <div class="accordion mb-3" id="accordionDettagli">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingThree">
@@ -152,7 +159,9 @@
             <asp:Panel ID="panRicerca" runat="server" DefaultButton="btnRicerca">
                 <!-- Card caricamento files -->
                 <div class="card p-3 mb-3">
-                    <h5 class="card-title">File</h5>
+                    <h5 class="card-title">
+                        <i class="fa-solid fa-file-arrow-up"></i> File
+                    </h5>
                     <p class="card-text">
                         Seleziona uno o più file in formato .gff3 e clicca sul pulsante carica. I risultati verranno mostrati in un'unica tabella.<br />
                         NB: Se il file è rinominato con il nome del campione verrà ricercato su Imicrobe 
@@ -318,6 +327,14 @@
                                         </div>
                                     </ItemTemplate>
                                 </asp:Repeater>
+
+                                <asp:Button 
+                                    ID="btnResetFiles" 
+                                    runat="server" 
+                                    OnClick="btnResetFiles_Click" 
+                                    Text="Reset files" 
+                                    CssClass="btn btn-danger"
+                                    Visible="false" />
                             </div>
                         </div>
                         <div id="divFileAggiuntivi" runat="server">
@@ -378,7 +395,9 @@
 
                 <!-- Card Filtri -->
                 <div id="CardFiltri" runat="server" class="card p-3">
-                    <h5 class="card-title">Filtri</h5>
+                    <h5 class="card-title">
+                        <i class="fa-solid fa-filter"></i> Filtri
+                    </h5>
                     <p class="card-text">
                         Filtrare i risultati per parole che devono/non devono essere presenti con la possibilità di selezionare su quale colonna/colonne
                         effettuare la ricerca.
@@ -466,15 +485,15 @@
                             </div>
                             <div class="col-md-10">
                                 <asp:CheckBoxList ID="cklColonne" runat="server" ClientIDMode="Static" AutoPostBack="false" RepeatLayout="Table" RepeatDirection="Horizontal">
-                                    <asp:ListItem Value="File" Selected="True">File</asp:ListItem>
-                                    <asp:ListItem Value="Sequid" Selected="True">Sequid</asp:ListItem>
-                                    <asp:ListItem Value="Source" Selected="True">Source</asp:ListItem>
-                                    <asp:ListItem Value="Type" Selected="True">Type</asp:ListItem>
-                                    <asp:ListItem Value="Start" Selected="True">Start</asp:ListItem>
-                                    <asp:ListItem Value="End" Selected="True">End</asp:ListItem>
-                                    <asp:ListItem Value="Score" Selected="True">Score</asp:ListItem>
-                                    <asp:ListItem Value="Strand" Selected="True">Strand</asp:ListItem>
-                                    <asp:ListItem Value="Phase" Selected="True">Phase</asp:ListItem>
+                                    <asp:ListItem Value="File" Selected="False">File</asp:ListItem>
+                                    <asp:ListItem Value="Sequid" Selected="False">Sequid</asp:ListItem>
+                                    <asp:ListItem Value="Source" Selected="False">Source</asp:ListItem>
+                                    <asp:ListItem Value="Type" Selected="False">Type</asp:ListItem>
+                                    <asp:ListItem Value="Start" Selected="False">Start</asp:ListItem>
+                                    <asp:ListItem Value="End" Selected="False">End</asp:ListItem>
+                                    <asp:ListItem Value="Score" Selected="False">Score</asp:ListItem>
+                                    <asp:ListItem Value="Strand" Selected="False">Strand</asp:ListItem>
+                                    <asp:ListItem Value="Phase" Selected="False">Phase</asp:ListItem>
                                     <asp:ListItem Value="Attributes" Selected="True">Attributes</asp:ListItem>
                                 </asp:CheckBoxList>
                             </div>
@@ -496,14 +515,14 @@
                         </div>
                         <div class="alert alert-info d-flex align-items-center" role="alert">
                             <i class="bi flex-shrink-0 me-2 fa-solid fa-circle-info"></i>
-                                <div>
-                                    <strong>Esempio: </strong>
-                            Devo filtrare i risultati in modo da avere soltanto quelli che contengono la parola "mitochondrial" nella colonna "Attributes".
+                            <div>
+                                <strong>Esempio: </strong>
+                                Devo filtrare i risultati in modo da avere soltanto quelli che contengono la parola "mitochondrial" nella colonna "Attributes".
                             In questo caso dovrò prima impostare la parola su "Contiene" e cliccare su "Aggiungi" per confermare, successivamente,
                             in "Ricerca in" rimuovo la spunta da tutte le checkbox lasciando attiva soltanto quella di "Attributes".
                             Infine clicco sul pulsante "Applica i filtri" per avviare la ricerca dei risultati.
-                                </div>
                             </div>
+                        </div>
                         <div style="display: inline-flex;">
                             <asp:Button
                                 ID="btnRicerca"
@@ -530,7 +549,9 @@
 
                 <!-- Card esportazione -->
                 <div id="CardEsportazione" runat="server" class="card p-3">
-                    <h5 class="card-title">Esporta</h5>
+                    <h5 class="card-title">
+                        <i class="fa-solid fa-file-export"></i> Esporta
+                    </h5>
                     <p class="card-text">
                         Esportazione dei dati nel formato richiesto.
                         La funzionalità permette di esportare dei dati custom come ad esempio combinazioni di file gff3, specifiche righe, dati aggregati come fasta e cds.
@@ -587,7 +608,7 @@
                     <asp:Button ID="colonna9" runat="server" CommandName="12" OnClick="mostraNascondiColonne" Text="Attributes" CssClass="btn btn-success" OnClientClick="showLoading();" />
                 </div>
                 <div class="col-md-2">
-                    Risultati:
+                    <strong>Risultati:</strong>
                     <asp:DropDownList
                         ID="ddlNumeroPagine"
                         runat="server"
@@ -609,7 +630,7 @@
             ClientIDMode="Static"
             runat="server"
             OnRowDataBound="gdvBiocoso_RowDataBound"
-            OnPageIndexChanging="gdvBiocoso_PageIndexChanging" AllowPaging="true" PageSize="2000"
+            OnPageIndexChanging="gdvBiocoso_PageIndexChanging" AllowPaging="true" PageSize="500"
             OnSorting="gdvBiocoso_Sorting" AllowSorting="true" CurrentSortDir="ASC" CurrentSortField="sequid"
             AlternatingRowStyle-CssClass="alt"
             AutoGenerateColumns="false"
@@ -619,9 +640,13 @@
             <PagerStyle CssClass="Footer" />
             <Columns>
                 <asp:TemplateField HeaderText="" ItemStyle-CssClass="short tdSelezione" HeaderStyle-CssClass="short">
+                    <HeaderTemplate>
+                        <input class="form-check-input" type="checkbox" id="chkSelezionaTutto" value="" aria-label="seleziona-tutto">
+                        <span id="numero-elementi-selezionati">0</span>
+                    </HeaderTemplate>
                     <ItemTemplate>
-                        <asp:CheckBox ID="chkSelezione" runat="server" HeaderText="Seleziona" />
-                        <%--                        <input class="form-check-input" type="checkbox" id="chkSelezione" value="" aria-label="seleziona">--%>
+                        <asp:CheckBox ID="chkSelezione" runat="server" HeaderText="Seleziona" CssClass="seleziona-elemento" />
+<%--                        <input class="form-check-input seleziona-elemento" type="checkbox" id="chkSelezione" runat="server" value="" aria-label="seleziona">--%>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:BoundField DataField="File" HeaderText="File" SortExpression="file" ItemStyle-CssClass="tdFile" />
@@ -629,7 +654,7 @@
                     <ItemTemplate>
                         <button
                             type="button"
-                            class="btn btn-outline-secondary"
+                            class="btn btn-outline-secondary FastaButton"
                             style='<%#(Eval("Fasta") == null || Eval("Fasta") == "" ? "display: none;": "")%>'
                             data-bs-toggle="popover"
                             title="Stringa del file Fasta"
@@ -643,7 +668,7 @@
                     <ItemTemplate>
                         <button
                             type="button"
-                            class="btn btn-outline-secondary"
+                            class="btn btn-outline-secondary CdsButton"
                             data-bs-toggle="popover"
                             style='<%#(Eval("CDS") == null || Eval("CDS") == "" ? "display: none;": "")%>'
                             title="Stringa del file CDS"
@@ -1002,16 +1027,16 @@
     </script>
 
     <script runat="server">
-        protected string GetFileName(object url)
+    protected string GetFileName(object url)
+    {
+        if (url != null)
         {
-            if (url != null)
-            {
-                string urlString = url.ToString();
-                string nomeFile = System.IO.Path.GetFileName(urlString);
-                return nomeFile;
-            }
-            return string.Empty;
+            string urlString = url.ToString();
+            string nomeFile = System.IO.Path.GetFileName(urlString);
+            return nomeFile;
         }
+        return string.Empty;
+    }
     </script>
 
     <!-- Abilita popper -->
@@ -1033,14 +1058,62 @@
 
     <!-- Click su una riga della tabella valorizza la checkbox -->
     <script>
-        $('#gdvBiocoso tr').click(function () {
-            var checkbox = $(this).find('#chkSelezione')
-
-            if (checkbox.is(':checked')) {
-                checkbox.prop('checked', false);
-            } else {
-                checkbox.prop('checked', true);
+        $('#gdvBiocoso tr:not(.StickyHeader)').click(function (event) {
+            var tr = $(this).closest('tr');
+            if ($(event.target).is(':checkbox')) {
+                ImpostaBackgroundSelezione(tr, $(event.target).is(':checked'))
             }
+            else if (
+                $(event.target).hasClass('CdsButton') ||
+                $(event.target).closest('.CdsButton').length > 0 ||
+                $(event.target).hasClass('FastaButton') ||
+                $(event.target).closest('.FastaButton').length > 0) {
+                return;
+            }
+            else {
+                var checkbox = $(this).find('#chkSelezione')
+
+                if (checkbox.is(':checked')) {
+                    ImpostaBackgroundSelezione(tr, false)
+                    checkbox.prop('checked', false);
+                } else {
+                    ImpostaBackgroundSelezione(tr, true)
+                    checkbox.prop('checked', true);
+                }
+            }
+            ImpostaConteggioNumeroElementiSelezionati()
         })
+
+        function ImpostaBackgroundSelezione(tr, isChecked) {
+            if (isChecked) {
+                tr.css('background-color', '#93c2f5');
+            }
+            else {
+                tr.css('background-color', '');
+            }
+        }
+
+        function ImpostaConteggioNumeroElementiSelezionati() {
+            var numeroCheckboxSelezionate = $('#gdvBiocoso input[type="checkbox"]:checked:not(#chkSelezionaTutto)').length;
+            $("#numero-elementi-selezionati").text(numeroCheckboxSelezionate)
+        }
+    </script>
+    
+    <!-- Click seleziona tutto -->
+    <script>
+        $('#chkSelezionaTutto').change(function () {
+            var isChecked = $(this).prop('checked'); // Verifica lo stato della checkbox 'Seleziona Tutto'
+
+            $('.seleziona-elemento').each(function () {
+                var parentTR = $(this).closest('tr');
+                var checkbox = $(this).find('input[type="checkbox"]'); // Trova la checkbox all'interno dello span
+
+                if (checkbox.length > 0) {
+                    ImpostaBackgroundSelezione(parentTR, isChecked)
+                    checkbox.prop('checked', isChecked); // Imposta lo stato della checkbox all'interno dello span
+                }
+            });
+            ImpostaConteggioNumeroElementiSelezionati()
+        });
     </script>
 </asp:Content>

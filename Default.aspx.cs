@@ -231,7 +231,7 @@ namespace Gff3_tools
             {
                 request.Abort();
 
-                throw;
+                return null;
             }
         }
 
@@ -624,6 +624,12 @@ namespace Gff3_tools
 
                 repBtnModalFile.DataSource = listaSamples;
                 repBtnModalFile.DataBind();
+
+                btnResetFiles.Visible = true;
+            }
+            else
+            {
+                btnResetFiles.Visible = false;
             }
         }
 
@@ -1073,6 +1079,12 @@ namespace Gff3_tools
             colonna9.CssClass = "btn btn-success";
 
             aggiornaTabella(impostaFiltri());
+        }
+
+        protected void btnResetFiles_Click(object sender, EventArgs e)
+        {
+            Session.Clear();
+            Response.Redirect(Request.RawUrl);
         }
     }
 
