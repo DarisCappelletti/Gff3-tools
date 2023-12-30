@@ -63,7 +63,7 @@ namespace Gff3_tools
             }
         }
 
-        protected void ImportCSV(object sender, EventArgs e)
+        protected void ImportGff3Files(object sender, EventArgs e)
         {
             //Create a DataTable.
             DataTable dt = new DataTable();
@@ -937,7 +937,7 @@ namespace Gff3_tools
         protected void gdvBiocoso_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
             gdvBiocoso.PageIndex = e.NewPageIndex;
-            impostaFiltri(); // this is whatever method you call to bind your data.
+            aggiornaTabella(impostaFiltri());
         }
 
         protected void ddlNumeroRisultati_SelectedIndexChanged(object sender, EventArgs e)
@@ -1032,7 +1032,9 @@ namespace Gff3_tools
                 }
                 else if (ordine == "attributes")
                 {
-                    tab = direzione == SortDirection.Ascending ? tabella.OrderBy(x => x.Attributes) : tabella.OrderByDescending(x => x.Attributes);
+                    tab = direzione == SortDirection.Ascending 
+                        ? tabella.OrderBy(x => x.Attributes[0]) 
+                        : tabella.OrderByDescending(x => x.Attributes[0]);
                 }
 
                 return tab.ToList();
@@ -1086,6 +1088,30 @@ namespace Gff3_tools
             Session.Clear();
             Response.Redirect(Request.RawUrl);
         }
+
+        protected string GetFormattedAttribute(object dataItem)
+        {
+            if (dataItem != null && !string.IsNullOrEmpty(dataItem.ToString()))
+            {
+                string dataString = dataItem.ToString();
+                string[] parts = dataString.Split('=');
+
+                if (parts.Length == 2)
+                {
+                    string formattedString = $"<strong>{parts[0]}</strong> = {parts[1]}";
+                    return formattedString;
+                }
+                else
+                {
+                    return dataString;
+                }
+            }
+            else
+            {
+                return string.Empty; // O restituisci un valore predefinito appropriato
+            }
+        }
+
     }
 
     [Serializable]

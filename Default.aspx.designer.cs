@@ -195,6 +195,15 @@ namespace Gff3_tools
         protected global::System.Web.UI.WebControls.CheckBox chkSottolineaParole;
 
         /// <summary>
+        /// Controllo chkRaggruppaRisultati.
+        /// </summary>
+        /// <remarks>
+        /// Campo generato automaticamente.
+        /// Per la modifica, spostare la dichiarazione di campo dal file di progettazione al file code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkRaggruppaRisultati;
+
+        /// <summary>
         /// Controllo btnRicerca.
         /// </summary>
         /// <remarks>

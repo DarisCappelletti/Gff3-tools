@@ -322,6 +322,33 @@
                     $('#waiting-front').addClass('show')
                     return true
                 }
+
+                function showLoadingJS() {
+                    var waiting = document.getElementById('waiting');
+                    var waitingFront = document.getElementById('waiting-front');
+
+                    if (waiting && waitingFront) {
+                        waiting.classList.add('show');
+                        waitingFront.classList.add('show');
+                        return true;
+                    } else {
+                        return false; // Se gli elementi HTML non esistono
+                    }
+                }
+
+
+                function showLoading(callback) {
+                    $('#waiting').addClass('show')
+                    $('#waiting-front').addClass('show')
+                    callback();
+                }
+
+                // waiting
+                function hideLoading() {
+                    $('#waiting').removeClass('show')
+                    $('#waiting-front').removeClass('show')
+                    return true
+                }
             </script>
         </div>
 

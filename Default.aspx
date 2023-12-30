@@ -109,8 +109,21 @@
             color: white;
         }
 
-        #gdvBiocoso tr {
+        #gdvBiocoso > tbody > tr:not(.Footer) {
             cursor: pointer;
+        }
+
+        .Footer td span {
+            border: 1px solid black;
+            padding: 0 8px;
+        }
+
+        .Footer td a {
+            padding: 0 8px;
+        }
+
+        .Footer td a:hover {
+            border: 1px solid white;
         }
     </style>
 
@@ -119,7 +132,7 @@
         <div>
             <div class="row">
                 <div class="col-md-8">
-                    <h1><i class="fa-solid fa-dna"></i> Gff3 Tools</h1>
+                    <h1><i class="fa-solid fa-dna"></i>Gff3 Tools</h1>
                     <h2>Strumenti per lo studio di file in formato .gff3</h2>
                 </div>
                 <div class="col-md-4 text-end">
@@ -160,15 +173,14 @@
                 <!-- Card caricamento files -->
                 <div class="card p-3 mb-3">
                     <h5 class="card-title">
-                        <i class="fa-solid fa-file-arrow-up"></i> File
+                        <i class="fa-solid fa-file-arrow-up"></i>
+                        File
                     </h5>
                     <p class="card-text">
                         Seleziona uno o più file in formato .gff3 e clicca sul pulsante carica. I risultati verranno mostrati in un'unica tabella.<br />
                         NB: Se il file è rinominato con il nome del campione verrà ricercato su Imicrobe 
                         per estrapolare informazioni aggiuntive e permettere la visione dei download collegati.<br />
                         (esempio: MMETSP0013.gff3)
-                        
-
                     </p>
                     <div class="card-body">
                         <h6>Carica i file GFF3</h6>
@@ -181,7 +193,7 @@
                                     ClientIDMode="Static"
                                     Text="Carica file"
                                     CssClass="btn btn-secondary"
-                                    OnClick="ImportCSV"
+                                    OnClick="ImportGff3Files"
                                     OnClientClick="showLoading();" />
                             </div>
                             <div class="col-md-7">
@@ -328,11 +340,11 @@
                                     </ItemTemplate>
                                 </asp:Repeater>
 
-                                <asp:Button 
-                                    ID="btnResetFiles" 
-                                    runat="server" 
-                                    OnClick="btnResetFiles_Click" 
-                                    Text="Reset files" 
+                                <asp:Button
+                                    ID="btnResetFiles"
+                                    runat="server"
+                                    OnClick="btnResetFiles_Click"
+                                    Text="Reset files"
                                     CssClass="btn btn-danger"
                                     Visible="false" />
                             </div>
@@ -345,6 +357,7 @@
                                     <strong>Attenzione:</strong> caricare molti file FASTA aumenterà l'elaborazione dei dati. 
                                     Per evitare lunghe attese o timeout della pagina si suggerisce di filtrare i dati
                                     in base alle proprie necessità e successivamente caricare i file per aggregarli nella tabella.
+                                    In questo modo verranno associati soltanto i FASTA dei dati filtrati.
                                 </div>
                             </div>
                             <div class="row">
@@ -371,6 +384,7 @@
                                     <strong>Attenzione:</strong> caricare molti file CDS aumenterà l'elaborazione dei dati. 
                                     Per evitare lunghe attese o timeout della pagina si suggerisce di filtrare i dati
                                     in base alle proprie necessità e successivamente caricare i file per aggregarli nella tabella.
+                                    In questo modo verranno associati soltanto i CDS dei dati filtrati.
                                 </div>
                             </div>
                             <div class="row">
@@ -396,7 +410,8 @@
                 <!-- Card Filtri -->
                 <div id="CardFiltri" runat="server" class="card p-3">
                     <h5 class="card-title">
-                        <i class="fa-solid fa-filter"></i> Filtri
+                        <i class="fa-solid fa-filter"></i>
+                        Filtri
                     </h5>
                     <p class="card-text">
                         Filtrare i risultati per parole che devono/non devono essere presenti con la possibilità di selezionare su quale colonna/colonne
@@ -513,6 +528,33 @@
                                 <asp:CheckBox ID="chkSottolineaParole" runat="server" ClientIDMode="Static" />
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <strong>Raggruppa i risultati per SEQUID:</strong>
+                                <span
+                                    class="info-color"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Permette raggruppare i risultati della tabella con lo stesso SEQUID nella pagina attuale.">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                </span>
+                            </div>
+                            <div class="col-md-9">
+                                <asp:CheckBox ID="chkRaggruppaRisultati" runat="server" ClientIDMode="Static" />
+                            </div>
+                            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                <i class="bi flex-shrink-0 me-2 fa-solid fa-triangle-exclamation"></i>
+                                <div>
+                                    <strong>Attenzione:</strong> nella modalità di visione per "raggruppamento" verrà mostrato soltanto il primo
+                                    risultato e gli altri con lo stesso SEQUID verranno nascosti. 
+                                    Per questa modalità <strong>SI CONSIGLIA</strong> di utilizzare l'ordinamento
+                                    per SEQUID (di default) per una visione corretta dei risultati.
+                                    Cliccando nell'icona <i class="fa-solid fa-angles-down"></i>verranno mostrati gli altri
+                                    risultati (se ci sono) e si potranno visionare e selezionare eventualmente. Cliccando nuovamente sull'icona
+                                    <i class="fa-solid fa-angles-down"></i>verranno nascosti i risultati e rimosse eventuali selezioni delle righe.
+                                </div>
+                            </div>
+                        </div>
                         <div class="alert alert-info d-flex align-items-center" role="alert">
                             <i class="bi flex-shrink-0 me-2 fa-solid fa-circle-info"></i>
                             <div>
@@ -550,7 +592,8 @@
                 <!-- Card esportazione -->
                 <div id="CardEsportazione" runat="server" class="card p-3">
                     <h5 class="card-title">
-                        <i class="fa-solid fa-file-export"></i> Esporta
+                        <i class="fa-solid fa-file-export"></i>
+                        Esporta
                     </h5>
                     <p class="card-text">
                         Esportazione dei dati nel formato richiesto.
@@ -587,6 +630,7 @@
         <!-- stato -->
         <div class="stato">
             <asp:Label ID="stato" runat="server"></asp:Label>
+            <div id="numeroRisultatiAccorpati"></div>
         </div>
 
         <!-- pulsanti tabella -->
@@ -614,8 +658,8 @@
                         runat="server"
                         AutoPostBack="true"
                         OnSelectedIndexChanged="ddlNumeroRisultati_SelectedIndexChanged">
-                        <asp:ListItem Value="100">100</asp:ListItem>
-                        <asp:ListItem Value="500" Selected="True">500</asp:ListItem>
+                        <asp:ListItem Value="100" Selected="True">100</asp:ListItem>
+                        <asp:ListItem Value="500">500</asp:ListItem>
                         <asp:ListItem Value="1000">1000</asp:ListItem>
                         <asp:ListItem Value="2000">2000</asp:ListItem>
                         <asp:ListItem Value="4000">4000</asp:ListItem>
@@ -630,7 +674,7 @@
             ClientIDMode="Static"
             runat="server"
             OnRowDataBound="gdvBiocoso_RowDataBound"
-            OnPageIndexChanging="gdvBiocoso_PageIndexChanging" AllowPaging="true" PageSize="500"
+            OnPageIndexChanging="gdvBiocoso_PageIndexChanging" AllowPaging="true" PageSize="100"
             OnSorting="gdvBiocoso_Sorting" AllowSorting="true" CurrentSortDir="ASC" CurrentSortField="sequid"
             AlternatingRowStyle-CssClass="alt"
             AutoGenerateColumns="false"
@@ -646,7 +690,7 @@
                     </HeaderTemplate>
                     <ItemTemplate>
                         <asp:CheckBox ID="chkSelezione" runat="server" HeaderText="Seleziona" CssClass="seleziona-elemento" />
-<%--                        <input class="form-check-input seleziona-elemento" type="checkbox" id="chkSelezione" runat="server" value="" aria-label="seleziona">--%>
+                        <%--                        <input class="form-check-input seleziona-elemento" type="checkbox" id="chkSelezione" runat="server" value="" aria-label="seleziona">--%>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:BoundField DataField="File" HeaderText="File" SortExpression="file" ItemStyle-CssClass="tdFile" />
@@ -690,7 +734,8 @@
                     <ItemTemplate>
                         <asp:Repeater runat="server" DataSource='<%# Eval("Attributes") %>'>
                             <ItemTemplate>
-                                <%# Container.DataItem.ToString() ?? string.Empty%><br />
+                                <%--                                <%# Container.DataItem.ToString() ?? string.Empty%><br />--%>
+                                <asp:Literal runat="server" Text='<%# GetFormattedAttribute(Container.DataItem) %>'></asp:Literal><br />
                             </ItemTemplate>
                         </asp:Repeater>
                     </ItemTemplate>
@@ -714,7 +759,7 @@
             if (hid.length > 0 && hid.val() != null) {
                 // ottengo un array degli elementi della lista
                 listaDati = hid.val().split(';')
-                console.log(listaDati)
+
                 // rimuovo elemento da array
                 for (var i = listaDati.length - 1; i >= 0; i--) {
                     if (listaDati[i] === valoreStringa) {
@@ -722,7 +767,7 @@
                         break
                     }
                 }
-                console.log(listaDati)
+
                 // aggiorno la input hidden
                 hid.val(listaDati.join(';'))
 
@@ -1027,16 +1072,16 @@
     </script>
 
     <script runat="server">
-    protected string GetFileName(object url)
-    {
-        if (url != null)
+        protected string GetFileName(object url)
         {
-            string urlString = url.ToString();
-            string nomeFile = System.IO.Path.GetFileName(urlString);
-            return nomeFile;
+            if (url != null)
+            {
+                string urlString = url.ToString();
+                string nomeFile = System.IO.Path.GetFileName(urlString);
+                return nomeFile;
+            }
+            return string.Empty;
         }
-        return string.Empty;
-    }
     </script>
 
     <!-- Abilita popper -->
@@ -1058,7 +1103,7 @@
 
     <!-- Click su una riga della tabella valorizza la checkbox -->
     <script>
-        $('#gdvBiocoso tr:not(.StickyHeader)').click(function (event) {
+        $('#gdvBiocoso > tbody > tr:not(.StickyHeader):not(.Footer)').click(function (event) {
             var tr = $(this).closest('tr');
             if ($(event.target).is(':checkbox')) {
                 ImpostaBackgroundSelezione(tr, $(event.target).is(':checked'))
@@ -1067,7 +1112,9 @@
                 $(event.target).hasClass('CdsButton') ||
                 $(event.target).closest('.CdsButton').length > 0 ||
                 $(event.target).hasClass('FastaButton') ||
-                $(event.target).closest('.FastaButton').length > 0) {
+                $(event.target).closest('.FastaButton').length > 0 ||
+                $(event.target).hasClass('.chiudi-espandi-risultati') ||
+                $(event.target).closest('.chiudi-espandi-risultati').length > 0) {
                 return;
             }
             else {
@@ -1098,7 +1145,7 @@
             $("#numero-elementi-selezionati").text(numeroCheckboxSelezionate)
         }
     </script>
-    
+
     <!-- Click seleziona tutto -->
     <script>
         $('#chkSelezionaTutto').change(function () {
@@ -1109,11 +1156,86 @@
                 var checkbox = $(this).find('input[type="checkbox"]'); // Trova la checkbox all'interno dello span
 
                 if (checkbox.length > 0) {
-                    ImpostaBackgroundSelezione(parentTR, isChecked)
-                    checkbox.prop('checked', isChecked); // Imposta lo stato della checkbox all'interno dello span
+                    // Verifica se la tr è visibile
+                    if (parentTR.is(':visible')) {
+                        // Se la tr è visibile, esegui le operazioni desiderate
+                        ImpostaBackgroundSelezione(parentTR, isChecked);
+                        checkbox.prop('checked', isChecked); // Imposta lo stato della checkbox all'interno dello span
+                    }
                 }
             });
             ImpostaConteggioNumeroElementiSelezionati()
         });
+    </script>
+
+    <!-- Script raggruppamento dati per SEQUID -->
+    <script>
+        $(document).ready(function () {
+            // se è attiva l'opzione
+            if ($('#chkRaggruppaRisultati').is(":checked")) {
+                showLoading(function () {
+                    RaggruppaRisultati(function () {
+                        hideLoading();
+                    });
+                });
+
+                $('#gdvBiocoso .chiudi-espandi-risultati').on('click', function () {
+                    var parentTR = $(this).closest('tr');
+                    var dato = parentTR.find('.tdSequid').text();
+                    var visibleRows = $('#gdvBiocoso tbody tr:visible'); // Ottieni le righe visibili
+                    var hiddenRows = $('#gdvBiocoso tbody tr:hidden'); // Ottieni le righe nascoste
+
+                    var duplicateRows = visibleRows.filter(function () {
+                        return $(this).find('.tdSequid').text() === dato && !$(this).is($(this).siblings(':visible'));
+                    });
+
+                    if (duplicateRows.length > 1) {
+                        duplicateRows.each(function () {
+                            ImpostaBackgroundSelezione($(this), false)
+                        });
+                        duplicateRows.find('input[type="checkbox"]').prop('checked', false); // Deseleziona i checkbox
+                        duplicateRows.slice(1).hide('slow'); // Nascondi i duplicati relativi al dato cliccato
+                    } else {
+                        hiddenRows.filter(function () {
+                            return $(this).find('.tdSequid').text() === dato;
+                        }).show('slow'); // Mostra le righe nascoste con lo stesso dato
+                    }
+                    ImpostaConteggioNumeroElementiSelezionati()
+                });
+            }
+        });
+
+        function RaggruppaRisultati(callback) {
+            var seen = {};
+            $('#gdvBiocoso > tbody > tr:not(.StickyHeader):not(.Footer)').each(function () {
+                var dato = $(this).find('.tdSequid').text();
+
+                // Seleziona tutti gli elementi con lo stesso dato
+                var altreOccorrenze = $('#gdvBiocoso > tbody > tr:not(.StickyHeader):not(.Footer)').filter(function () {
+                    return $(this).find('.tdSequid').text() === dato;
+                });
+
+                if (altreOccorrenze.length > 1 && !seen[dato]) {
+                    // Se ci sono altre occorrenze e il dato non è stato visto, esegui l'append
+                    $(this).find('.tdSelezione')
+                        .append('<button type="button" class="btn btn-secondary chiudi-espandi-risultati"><i class="fa-solid fa-angles-down"></i></button>');
+                    seen[dato] = true;
+                } else if (altreOccorrenze.length === 1 && !seen[dato]) {
+                    // Se c'è solo un'occorrenza e il dato non è stato visto, non eseguire l'append
+                    seen[dato] = true;
+                } else {
+                    // Nascondi l'elemento se il dato è stato visto
+                    $(this).find('.tdSelezione')
+                        .append('<i class="fa-solid fa-window-minimize"></i>');
+                    $(this).hide();
+                }
+            });
+
+            console.log(seen)
+            var numberOfKeys = Object.keys(seen).length;
+            $("#numeroRisultatiAccorpati").html("<strong>" + numberOfKeys + "</strong> raggruppati nella pagina attuale.")
+
+            callback();
+        }
     </script>
 </asp:Content>
