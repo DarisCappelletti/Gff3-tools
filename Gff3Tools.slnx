@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Gff3Tools.Tests/Gff3Tools.Tests.csproj" />
+  <Project Path="Gff3Tools/Gff3Tools.csproj" />
+</Solution>
