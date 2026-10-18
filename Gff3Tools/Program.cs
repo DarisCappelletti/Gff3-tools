@@ -3,6 +3,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+// La tabella resta in sessione mentre si caricano file, si filtra e si esporta
+builder.Services.AddSession(opzioni => opzioni.IdleTimeout = TimeSpan.FromHours(8));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -17,6 +20,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthorization();
 

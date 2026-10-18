@@ -1,0 +1,7 @@
+##gff-version 3
+MMETSP0013|k141_1000	example	gene	100	500	.	+	.	ID=gene00001;Name=EDEN
+MMETSP0013|k141_1000	example	CDS	100	300	.	+	0	ID=cds00001;Parent=gene00001
+MMETSP0013|k141_1000	example	exon	100	200	.	+	.	Parent=cds00001
+MMETSP0013|k141_2000	example	gene	700	900	.	-	.	ID=gene00002;Name=EDEN2
+MMETSP0013|k141_2000	example	CDS	750	880	.	-	0	ID=cds00002;Parent=gene00002
+MMETSP0013|k141_3000	example	mRNA	50	80	0.98	+	.	ID=mrna00003
