@@ -11,6 +11,12 @@ This is an online tool that allows you to perform various operations on GFF3 fil
 - Data Editing: Edit the data within the GFF3 files directly within the user interface, such as correcting errors or adding additional information.
 - Exporting Results: Export the results of the operations performed in various formats, such as GFF3 files, CDS files or XLS files.
 
+## Repository structure
+
+- `Gff3Tools/` — the tool as an ASP.NET Core 8 (Razor Pages) application; the current version
+- `Gff3Tools.Tests/` — xunit tests for parser, filters, FASTA/CDS matching and exports
+- `legacy/` — the original ASP.NET Web Forms (.NET Framework 4.8) app, kept as the version currently deployed at [gff3tools.dariscappelletti.com](https://gff3tools.dariscappelletti.com/)
+
 ## Usage
 
 1. Access the [tool's website](https://gff3tools.dariscappelletti.com/) from your web browser.
